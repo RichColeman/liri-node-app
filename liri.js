@@ -5,33 +5,31 @@ const Spotify = require("node-spotify-api");
 const spotify = new Spotify(keys.spotify);
 const bandsintown = keys.bandsintown;
 const request = require("request");
-const https = require("https");
 const fs = require("fs");
+
 
 // define commands and userInput
 const command = process.argv[2];
-const userInput = process.argv.slice(3).join(" ");
+let userInput = process.argv.slice(3).join(" ");
 
-const spotifyThisSong = function() {
-  spotify.search(
-    {
+const spotifyThisSong = function () {
+  spotify.search({
       type: "track",
       query: userInput,
       limit: 1
     },
-    function(err, data) {
+    function (err, data) {
       if (err) {
         console.log(
           "Error occurred: " + err + `\nLooks like you need some Ace of Base!\n`
         );
-        spotify.search(
-          {
+        spotify.search({
             type: "track",
             query: `I Saw The Sign`,
             artists: "Ace of Base",
             limit: 1
           },
-          function(err, data) {
+          function (err, data) {
             if (err) {
               console.log("whoops");
             }
@@ -58,15 +56,14 @@ const spotifyThisSong = function() {
   );
 };
 
-const concertThis = function() {
+const concertThis = function () {
   const queryURL =
     "https://rest.bandsintown.com/artists/" +
     userInput +
     "/events?app_id=" +
     bandsintown;
   request(
-    queryURL,
-    {
+    queryURL, {
       json: true
     },
     (err, res, body) => {
@@ -95,11 +92,10 @@ const concertThis = function() {
   // console.log(body, `Venue: ` + bitVenue, "Artist: " + bitArtist, "Location: " + bitLocation)
 };
 
-const movieThis = function() {
+const movieThis = function () {
   const movieURL = `http://www.omdbapi.com/?apikey=trilogy&t=` + userInput;
   request(
-    movieURL,
-    {
+    movieURL, {
       json: true
     },
     (err, res, body) => {
@@ -124,9 +120,6 @@ const movieThis = function() {
   );
 };
 
-const doThis = function(){
-
-}
 
 // make a decision based on the command
 switch (command) {
@@ -140,9 +133,26 @@ switch (command) {
     movieThis();
     break;
   case "do-what-it-says":
-    doThis();
+    fs.readFile("random.txt", "utf8",
+      function (error, data) {
+        if (error) {
+          return console.log(error);
+        } else {
+          var dataArr = data.split(",");
+          userInput = dataArr[1];
+          if (dataArr[0] == "spotify-this-song") {
+            spotifyThisSong();
+          } else if (dataArr[0] == "movie-this") {
+            movieThis();
+          } else if (dataArr[0] == "concert-this") {
+            concertThis();
+          } else {
+            console.log(`Sorry, I don't understand! Start with movie-this, spotify-this-song, or concert-this!`)
+          }
+        }
+      });
+    break;
   default:
     console.log(
-      "Hmm, i don't know that one. Try again with a different command."
-    );
+      `Sorry, I don't understand! Start with movie-this, spotify-this-song, or concert-this!`);
 }
