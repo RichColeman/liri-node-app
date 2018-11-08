@@ -6,6 +6,8 @@ const spotify = new Spotify(keys.spotify);
 const bandsintown = keys.bandsintown;
 const request = require("request");
 const fs = require("fs");
+const moment = require('moment');
+
 
 
 // define commands and userInput
@@ -80,7 +82,7 @@ const concertThis = function () {
             body[i].venue.region +
             ", " +
             body[i].venue.country;
-          let bitDate = body[i].datetime;
+          let bitDate = moment(body[i].datetime).format('L');
           console.log(
             `========================\n${bitArtist} will be performing on ${bitDate} at:\n${bitVenue}\n${bitLocation}\n========================\n`
           );
