@@ -6,12 +6,12 @@ const spotify = new Spotify(keys.spotify);
 const bandsintown = keys.bandsintown;
 const request = require("request");
 const https = require("https");
+const fs = require("fs");
 
 // define commands and userInput
 const command = process.argv[2];
 const userInput = process.argv.slice(3).join(" ");
 
-// create SpotifyThis function
 const spotifyThisSong = function() {
   spotify.search(
     {
@@ -104,14 +104,29 @@ const movieThis = function() {
     },
     (err, res, body) => {
       if (err) {
-        return console.log(err);
+        console.log(
+          `Hmm, you didn't specify a movie! Here's some info on You've Got Mail instead.`
+        );
       } else {
-        console.log(`\nHELLO, THANK YOU FOR USING LIRI! SEE INFO BELOW:\n`);
-        console.log(body);
+        const omdbTitle = body.Title;
+        const omdbYear = body.Year;
+        const omdbRating = body.imdbRating;
+        const omdbRT = body.Ratings[1].Value;
+        const omdbCountry = body.Country;
+        const omdbPlot = body.Plot;
+        const omdbLanguage = body.Language;
+        const omdbActors = body.Actors;
+        console.log(
+          `\nHELLO, THANK YOU FOR USING LIRI! SEE INFO BELOW:\n========================\nTitle: ${omdbTitle}\nYear: ${omdbYear}\nIMDB Rating: ${omdbRating}\nRotten Tomatoes: ${omdbRT}\nCountry: ${omdbCountry}\nLanguage: ${omdbLanguage}\nPlot: ${omdbPlot}\nActors: ${omdbActors}\n========================\n`
+        );
       }
     }
   );
 };
+
+const doThis = function(){
+
+}
 
 // make a decision based on the command
 switch (command) {
@@ -124,6 +139,8 @@ switch (command) {
   case "movie-this":
     movieThis();
     break;
+  case "do-what-it-says":
+    doThis();
   default:
     console.log(
       "Hmm, i don't know that one. Try again with a different command."
